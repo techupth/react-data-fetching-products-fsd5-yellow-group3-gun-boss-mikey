@@ -7,6 +7,7 @@ function App() {
   const [blogPosts, setBlogPosts] = useState([]);
   const [updateTrigger, setUpdateTrigger] = useState(false);
   const [status, setStatus] = useState("loading");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     getBlogPost();
@@ -19,8 +20,10 @@ function App() {
       setStatus("loaded");
     } catch (error) {
       setStatus("error");
+      setErrorMessage(error);
     }
   };
+  console.log(errorMessage);
 
   const handleDelete = (productId) => {
     deleteProductInDb(productId);
@@ -46,7 +49,7 @@ function App() {
   if (status === "loading") {
     return <h1>Loading...</h1>;
   } else if (status === "error") {
-    return <h1>Error</h1>;
+    return <h1>{errorMessage.message}</h1>;
   } else if (status === "loaded") {
     return (
       <div className="App">
