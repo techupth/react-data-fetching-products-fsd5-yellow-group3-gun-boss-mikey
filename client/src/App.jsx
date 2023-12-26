@@ -6,14 +6,20 @@ import Product from "./components/Product";
 function App() {
   const [blogPosts, setBlogPosts] = useState([]);
   const [updateTrigger, setUpdateTrigger] = useState(false);
+  const [status, setStatus] = useState("loading");
 
   useEffect(() => {
     getBlogPost();
   }, [updateTrigger]);
 
   const getBlogPost = async () => {
-    const result = await axios.get("http://localhost:4001/products/");
-    setBlogPosts(result.data.data);
+    try {
+      const result = await axios.get("http://localhost:4001/products/");
+      setBlogPosts(result.data.data);
+      setStatus("loaded");
+    } catch (error) {
+      setStatus("error");
+    }
   };
 
   const handleDelete = (productId) => {
@@ -37,14 +43,20 @@ function App() {
     />
   ));
 
-  return (
-    <div className="App">
-      <div className="app-wrapper">
-        <h1 className="app-title">Products</h1>
+  if (status === "loading") {
+    return <h1>Loading...</h1>;
+  } else if (status === "error") {
+    return <h1>Error</h1>;
+  } else if (status === "loaded") {
+    return (
+      <div className="App">
+        <div className="app-wrapper">
+          <h1 className="app-title">Products</h1>
+        </div>
+        <div className="product-list">{productElements}</div>
       </div>
-      <div className="product-list">{productElements}</div>
-    </div>
-  );
+    );
+  }
 }
 
 export default App;
