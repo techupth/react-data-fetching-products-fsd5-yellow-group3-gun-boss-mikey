@@ -1,30 +1,48 @@
+import { useEffect, useState } from "react";
 import "./App.css";
+import axios from "axios";
+import Product from "./components/Product";
 
 function App() {
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [updateTrigger, setUpdateTrigger] = useState(false);
+
+  useEffect(() => {
+    getBlogPost();
+  }, [updateTrigger]);
+
+  const getBlogPost = async () => {
+    const result = await axios.get("http://localhost:4001/products/");
+    setBlogPosts(result.data.data);
+  };
+
+  const handleDelete = (productId) => {
+    deleteProductInDb(productId);
+    setUpdateTrigger((prev) => !prev);
+  };
+
+  const deleteProductInDb = async (productId) => {
+    console.log(productId);
+    await axios.delete(`http://localhost:4001/products/${productId}`);
+  };
+
+  const productElements = blogPosts.map((post) => (
+    <Product
+      key={post.id}
+      id={post.id}
+      name={post.name}
+      price={post.price}
+      img={post.image}
+      deleteInDb={() => handleDelete(post.id)}
+    />
+  ));
+
   return (
     <div className="App">
       <div className="app-wrapper">
         <h1 className="app-title">Products</h1>
       </div>
-      <div className="product-list">
-        <div className="product">
-          <div className="product-preview">
-            <img
-              src="https://via.placeholder.com/350/350"
-              alt="some product"
-              width="350"
-              height="350"
-            />
-          </div>
-          <div className="product-detail">
-            <h1>Product name: ...</h1>
-            <h2>Product price: ... Baht</h2>
-            <p>Product description: .....</p>
-          </div>
-
-          <button className="delete-button">x</button>
-        </div>
-      </div>
+      <div className="product-list">{productElements}</div>
     </div>
   );
 }
